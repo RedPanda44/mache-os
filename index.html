@@ -2,25 +2,20 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <!-- FULLSCREEN FIX: viewport-fit=cover makes it stretch behind the iPhone notch -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Mache™ Beta | Premium Personal OS</title>
     
-    <!-- === iOS NATIVE APP UPGRADES === -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Mache">
     <meta name="theme-color" content="#070709">
     <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3288/3288006.png">
     
-    <!-- Virtual Web App Manifest to force Standalone Fullscreen Mode -->
     <link rel="manifest" href="data:application/manifest+json;base64,eyJuYW1lIjoiTWFjaGUgT1MiLCJzaG9ydF9uYW1lIjoiTWFjaGUiLCJkaXNwbGF5Ijoic3RhbmRhbG9uZSIsImJhY2tncm91bmRfY29sb3ciOiIjMDcwNzA5IiwidGhlbWVfY29sb3ciOiIjMDcwNzA5In0=" />
     
-    <!-- Fonts and Icons -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     
-    <!-- Mammoth.js for parsing .docx files directly in the browser -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.4.21/mammoth.browser.min.js"></script>
     
     <style>
@@ -511,7 +506,6 @@
 </head>
 <body>
 
-    <!-- ==================== THE MASTER LOADING SCREEN ==================== -->
     <div id="loading-screen" class="screen">
         <div class="loader-wrapper">
             <div class="loader-ring ring-1"></div>
@@ -525,7 +519,6 @@
         </div>
     </div>
 
-    <!-- ==================== TERMS OF SERVICE MODAL ==================== -->
     <div id="tos-screen" class="screen">
         <button class="back-btn" onclick="showScreen('auth-screen')"><i class="ph-bold ph-arrow-left"></i> Back</button>
         <div class="card" style="width: 600px; max-width: 92%; max-height: 80vh; overflow-y: auto; margin: auto; position: relative; top: 50%; transform: translateY(-50%); animation: scaleFadeIn 0.5s var(--ease-bouncy);">
@@ -541,7 +534,6 @@
         </div>
     </div>
 
-    <!-- ==================== PROFILE EDIT MODAL ==================== -->
     <div id="profile-modal" class="modal-overlay" onclick="if(event.target===this) closeProfileModal()">
         <div class="modal-card">
             <h2 style="font-size: 24px; font-weight: 700; margin-bottom: 24px; text-align: center;">Profile Settings</h2>
@@ -576,7 +568,6 @@
         </div>
     </div>
 
-    <!-- ==================== LANDING PAGE ==================== -->
     <div id="landing-screen" class="screen active">
         <div class="ambient-orb orb-1"></div>
         <div class="ambient-orb orb-2"></div>
@@ -589,7 +580,6 @@
                 <a href="#features" class="landing-nav-link">Features</a>
                 <a href="#about" class="landing-nav-link">Infrastructure</a>
                 
-                <!-- FIX: Added cursor styling -->
                 <a onclick="switchAuth(true)" class="landing-nav-link" style="cursor: pointer;">Sign In</a>
                 <button class="btn btn-primary" onclick="switchAuth(false)">Get Started</button>
             </div>
@@ -660,7 +650,6 @@
         </footer>
     </div>
 
-    <!-- ==================== AUTHENTICATION SCREEN ==================== -->
     <div id="auth-screen" class="screen">
         <button class="back-btn" onclick="showScreen('landing-screen')"><i class="ph-bold ph-arrow-left"></i> Back to Home</button>
         <div class="auth-card">
@@ -715,7 +704,6 @@
         </div>
     </div>
 
-    <!-- ==================== QUESTIONNAIRE SCREEN ==================== -->
     <div id="questionnaire-screen" class="screen">
         <div class="q-card">
             <h2 style="font-size:28px; font-weight: 700; margin-bottom:8px; letter-spacing: -0.5px;">Tailor your experience</h2>
@@ -742,7 +730,6 @@
         </div>
     </div>
 
-    <!-- ==================== ONBOARDING SCREEN ==================== -->
     <div id="onboarding-screen" class="screen">
         <div class="onboarding-content">
             <i class="ph-fill ph-rocket-launch" style="font-size: 64px; color: var(--accent-blue); margin-bottom: 24px; animation: float 4s ease-in-out infinite;"></i>
@@ -752,7 +739,6 @@
         </div>
     </div>
 
-    <!-- ==================== MAIN APPLICATION ==================== -->
     <div id="app-screen" class="screen">
         <div class="sidebar-overlay" id="sidebar-overlay" onclick="toggleSidebar()"></div>
         
@@ -815,7 +801,6 @@
 
             <div class="views-container">
                 
-                <!-- VIEW: DASHBOARD -->
                 <section id="view-dashboard" class="view-section active">
                     <h2 class="page-title">Overview</h2>
                     
@@ -845,7 +830,6 @@
                     </div>
                 </section>
 
-                <!-- VIEW: WHAT'S NEW -->
                 <section id="view-updates" class="view-section">
                     <h2 class="page-title">What's New</h2>
                     <div class="card">
@@ -863,7 +847,6 @@
                     </div>
                 </section>
 
-                <!-- VIEW: TASKS -->
                 <section id="view-tasks" class="view-section">
                     <h2 class="page-title">Tasks</h2>
                     <div class="card flex-row-mobile-stack" style="padding: 16px; display: flex; gap: 12px; align-items: center;">
@@ -873,7 +856,6 @@
                     <div class="card" style="min-height: 300px;"><div class="item-list" id="full-tasks-list"></div></div>
                 </section>
 
-                <!-- VIEW: GOALS -->
                 <section id="view-goals" class="view-section">
                     <h2 class="page-title">Personal Goals</h2>
                     <div class="card flex-row-mobile-stack" style="padding: 16px; display: flex; gap: 12px; align-items: center;">
@@ -890,7 +872,6 @@
                     <div class="card" style="min-height: 300px;"><div class="item-list" id="full-goals-list"></div></div>
                 </section>
 
-                <!-- VIEW: FINANCE -->
                 <section id="view-finance" class="view-section">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
                         <h2 class="page-title" style="margin:0;">Financial Portfolio</h2>
@@ -918,7 +899,6 @@
                     <div class="card"><h3 style="font-size: 16px; margin-bottom: 16px;">Recent Transactions</h3><div id="fin-transactions-list" class="item-list"></div></div>
                 </section>
 
-                <!-- VIEW: STUDY HUB -->
                 <section id="view-study" class="view-section">
                     <h2 class="page-title">Study Hub</h2>
                     <div style="display: flex; gap: 24px;">
@@ -980,7 +960,6 @@
                     </div>
                 </section>
 
-                <!-- VIEW: CLIENTS (STAFF) -->
                 <section id="view-clients" class="view-section">
                     <h2 class="page-title">Client Directory</h2>
                     <div class="card" style="padding: 0; overflow: hidden;">
@@ -993,7 +972,6 @@
                     </div>
                 </section>
 
-                <!-- VIEW: TICKETS (STAFF) -->
                 <section id="view-tickets" class="view-section">
                     <h2 class="page-title">Support Tickets Queue</h2>
                     <div class="card" style="padding: 0; overflow: hidden;">
@@ -1006,7 +984,6 @@
                     </div>
                 </section>
 
-                <!-- VIEW: SUPPORT (CLIENT) -->
                 <section id="view-support" class="view-section">
                     <h2 class="page-title">Help & Support</h2>
                     <div class="card">
@@ -1017,7 +994,6 @@
                     </div>
                 </section>
 
-                <!-- VIEW: AI ASSISTANT -->
                 <section id="view-assistant" class="view-section">
                     <div class="chat-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; background:transparent; padding:0; border:none;">
                         <h2 class="page-title" style="margin: 0;">Personal AI</h2>
@@ -1045,7 +1021,6 @@
                     </div>
                 </section>
 
-                <!-- VIEW: SETTINGS -->
                 <section id="view-settings" class="view-section">
                     <h2 class="page-title">Settings</h2>
                     
@@ -1074,11 +1049,11 @@
         </main>
     </div>
 
-    <!-- --- SCRIPTS --- -->
     <script>
         const OWNER_EMAIL = "an631689@icloud.com";
         // FIX: Dynamic URL targeting for iOS vs Desktop Node.js server
-       const BACKEND_URL = window.location.origin;
+        const BACKEND_URL = window.location.origin;
+        
         let isLoginMode = true;
         let currentUser = null;
         
@@ -1236,16 +1211,14 @@
             
             if(title) title.innerText = isLoginMode ? 'Welcome Back' : 'Create Account';
             
-            // FIX: Uses innerText to preserve the arrow icon formatting safely
             if(btnText) btnText.innerText = isLoginMode ? 'Sign In' : 'Create Account';
             
-            // FIX: Tells the app to actually switch to the screen
             showScreen('auth-screen');
         }
 
         function toggleAuthMode() { switchAuth(!isLoginMode); }
 
-        function handleAuth(e) {
+        async function handleAuth(e) {
             e.preventDefault();
             
             if (!isLoginMode) {
@@ -1258,74 +1231,56 @@
 
             const emailInput = document.getElementById('auth-email');
             const passInput = document.getElementById('auth-pass');
+            const nameInput = document.getElementById('auth-name');
             const logo = document.getElementById('auth-logo');
+            const btnText = document.getElementById('auth-btn-text');
             
             if(!emailInput || !passInput) return;
 
             const email = emailInput.value.trim().toLowerCase();
-            const pass = passInput.value;
+            const password = passInput.value;
+            const name = nameInput ? nameInput.value.trim() : email.split('@')[0];
+            
+            const endpoint = isLoginMode ? '/api/auth/login' : '/api/auth/register';
 
             if(logo) logo.classList.add('logo-hyperdrive');
+            if(btnText) btnText.innerText = "Connecting...";
 
-            setTimeout(() => {
-                let db = JSON.parse(localStorage.getItem('macheUsersDB')) || {};
+            try {
+                const response = await fetch(`${BACKEND_URL}${endpoint}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password, name })
+                });
                 
-                if (isLoginMode) {
-                    const profile = db[email];
+                const data = await response.json();
+
+                if (data.success) {
+                    currentUser = data.user;
+                    localStorage.setItem('macheUser', JSON.stringify(currentUser));
                     
-                    if (!profile) {
-                        alert("Account not found. Please create an account first.");
-                        if(logo) logo.classList.remove('logo-hyperdrive');
-                        return;
+                    // Load their saved cloud data into your appData variable!
+                    if (currentUser.osData && Object.keys(currentUser.osData).length > 0) {
+                        appData = Object.assign(appData, currentUser.osData);
                     }
-
-                    if (profile.password && profile.password !== pass) {
-                        alert("Incorrect password. Please try again.");
-                        if(logo) logo.classList.remove('logo-hyperdrive');
-                        return;
-                    } else if (!profile.password) {
-                        profile.password = pass;
-                        db[email] = profile;
-                        localStorage.setItem('macheUsersDB', JSON.stringify(db));
-                    }
-
-                    currentUser = { 
-                        email, 
-                        name: profile.name || email.split('@')[0],
-                        role: (email === OWNER_EMAIL) ? 'owner' : (profile.role || 'client'), 
-                        hasAIAccess: profile.hasAIAccess || false 
-                    };
                     
                     if(logo) logo.classList.remove('logo-hyperdrive');
                     triggerLoadingScreen('login', () => {
-                        localStorage.setItem('macheUser', JSON.stringify(currentUser));
-                        loadLocalData(); 
                         syncRoleUI(); 
+                        renderAll();
                         showScreen('app-screen'); 
                         navigate('dashboard');
                     });
                 } else {
-                    if (db[email]) {
-                        alert("An account with this email already exists. Please sign in.");
-                        if(logo) logo.classList.remove('logo-hyperdrive');
-                        return;
-                    }
-
-                    const nameInput = document.getElementById('auth-name');
-                    const name = (nameInput && nameInput.value.trim() !== "") ? nameInput.value.trim() : email.split('@')[0];
-                    
-                    currentUser = { email, name, role: (email === OWNER_EMAIL) ? 'owner' : 'client', hasAIAccess: false };
-                    
-                    db[email] = { ...currentUser, password: pass };
-                    localStorage.setItem('macheUsersDB', JSON.stringify(db));
-                    localStorage.setItem('macheUser', JSON.stringify(currentUser));
-                    
+                    alert(data.error);
                     if(logo) logo.classList.remove('logo-hyperdrive');
-                    showScreen('questionnaire-screen');
+                    if(btnText) btnText.innerHTML = isLoginMode ? 'Sign In <i class="ph-bold ph-arrow-right"></i>' : 'Create Account <i class="ph-bold ph-arrow-right"></i>';
                 }
-                const authForm = document.getElementById('auth-form');
-                if(authForm) authForm.reset();
-            }, 1200); 
+            } catch (err) {
+                alert("Server Connection Failed. Please ensure your backend is running.");
+                if(logo) logo.classList.remove('logo-hyperdrive');
+                if(btnText) btnText.innerHTML = isLoginMode ? 'Sign In <i class="ph-bold ph-arrow-right"></i>' : 'Create Account <i class="ph-bold ph-arrow-right"></i>';
+            }
         }
 
         function selectCard(card) {
@@ -1560,7 +1515,24 @@
             renderAll();
         }
 
-        function saveData() { if(!currentUser) return; localStorage.setItem(`macheData_${currentUser.email}`, JSON.stringify(appData)); renderAll(); }
+        async function saveData() { 
+            if(!currentUser) return; 
+            
+            // Still save locally for instant UI updates
+            localStorage.setItem(`macheData_${currentUser.email}`, JSON.stringify(appData)); 
+            renderAll(); 
+
+            // Secretly back it up to the MongoDB Cloud
+            try {
+                await fetch(`${BACKEND_URL}/api/save-data`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: currentUser.email, osData: appData })
+                });
+            } catch(e) { 
+                console.error("Cloud Database Sync Failed", e); 
+            }
+        }
         
         function renderAll() { 
             renderTasks(); 

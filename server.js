@@ -1,103 +1,74 @@
-require('dotenv').config();
 const express = require('express');
+const mongoose = require('mongoose');
 const cors = require('cors');
-const { GoogleGenerativeAI } = require('@google/generative-ai');
+const path = require('path');
+require('dotenv').config();
 
 const app = express();
-
-// Enable CORS for all local requests
-app.use(cors());
 app.use(express.json());
+app.use(cors());
 
-// Initialize Google SDK
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+// 1. CONNECT TO PERMANENT CLOUD DATABASE
+mongoose.connect(process.env.MONGODB_URI)
+    .then(() => console.log("✅ Connected to Permanent MongoDB Atlas"))
+    .catch(err => console.error("❌ DB Connection Error:", err));
 
-// We use the standard flash model
-const MODEL_NAME = "gemini-2.5-flash";
+// 2. DEFINE HOW USER DATA IS SAVED
+const UserSchema = new mongoose.Schema({
+    email: { type: String, unique: true, required: true },
+    password: { type: String, required: true },
+    name: String,
+    role: { type: String, default: 'client' },
+    hasAIAccess: { type: Boolean, default: false },
+    osData: { 
+        type: Object, 
+        default: { tasks: [], goals: [], finance: { checking: 0, savings: 0, transactions: [] }, chatHistory: [], notes: [], flashcards: {} } 
+    }
+});
+const User = mongoose.model('User', UserSchema);
 
-// --- ROUTE 1: PERSONAL AI CHAT & SUMMARIZER ---
-app.post('/api/chat', async (req, res) => {
+// 3. SECURE AUTHENTICATION ROUTES
+app.post('/api/auth/register', async (req, res) => {
     try {
-        const { history, newMessage } = req.body;
-        
-        const model = genAI.getGenerativeModel({ 
-            model: "gemini-2.5-flash",
-            systemInstruction: "You are Gemini, an advanced Personal AI built by Google, integrated directly into Mache OS. Help the user optimize their daily workflow, academic studies, and organize their life. Be concise and professional."
-        });
-
-        // Google requires history to start with a 'user' message. 
-        // We filter out any leading AI greetings to prevent crashes.
-        let safeHistory = history.filter(msg => msg.text && msg.text.trim() !== "");
-        while(safeHistory.length > 0 && safeHistory[0].role !== 'user') {
-            safeHistory.shift(); 
-        }
-
-        const formattedHistory = safeHistory.map(msg => ({
-            role: msg.role === 'user' ? 'user' : 'model',
-            parts: [{ text: msg.text }],
-        }));
-
-        const chat = model.startChat({ history: formattedHistory });
-        const result = await chat.sendMessage(newMessage);
-        
-        res.json({ success: true, text: result.response.text() });
-
-    } catch (error) {
-        console.error("Chat Error:", error);
-        res.status(500).json({ success: false, error: "AI Error: " + error.message });
+        const { email, password, name } = req.body;
+        const newUser = new User({ email, password, name });
+        await newUser.save();
+        res.json({ success: true, user: newUser });
+    } catch (err) { 
+        res.status(400).json({ success: false, error: "An account with this email already exists." }); 
     }
 });
 
-// --- ROUTE 2: AI FLASHCARD GENERATOR ---
-app.post('/api/flashcards', async (req, res) => {
-    try {
-        const { text } = req.body;
-        
-        const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
-
-        const prompt = `
-        Analyze the following lecture notes/document. 
-        Create exactly 5 to 10 study flashcards based on the most important concepts.
-        You MUST respond ONLY with a raw, valid JSON array containing objects with "q" (question) and "a" (answer) keys.
-        Do not include markdown formatting like \`\`\`json. 
-        Match the exact language of the provided text.
-
-        Document Text:
-        "${text}"
-        
-        Expected JSON Format:
-        [{"q": "Question here", "a": "Answer here"}]
-        `;
-
-        const result = await model.generateContent(prompt);
-        let responseText = result.response.text();
-
-        // Clean up markdown block formatting if Gemini adds it
-        responseText = responseText.replace(/```json/g, '').replace(/```/g, '').trim();
-        
-        const flashcards = JSON.parse(responseText);
-
-        res.json({ success: true, flashcards: flashcards });
-
-    } catch (error) {
-        console.error("Flashcard Error:", error);
-        res.status(500).json({ success: false, error: "Failed to generate flashcards. Please check the text format." });
+app.post('/api/auth/login', async (req, res) => {
+    const { email, password } = req.body;
+    const user = await User.findOne({ email, password });
+    if (user) {
+        res.json({ success: true, user });
+    } else {
+        res.status(401).json({ success: false, error: "Invalid email or password." });
     }
 });
 
-const path = require('path');
+// 4. SAVE WORKSPACE DATA (Auto-saves tasks, money, goals)
+app.post('/api/save-data', async (req, res) => {
+    try {
+        const { email, osData } = req.body;
+        await User.findOneAndUpdate({ email }, { osData });
+        res.json({ success: true });
+    } catch (err) {
+        res.status(500).json({ success: false, error: "Failed to save data" });
+    }
+});
 
-// ... keep all your existing AI routes above ...
-
-// NEW: Tell the server to serve your static frontend files
+// 5. HOST THE FRONTEND WEBSITE
 app.use(express.static(path.join(__dirname, '.')));
 
-// NEW EXPRESS 5 FORMAT FOR CATCH-ALL
+// The Express 5 fix for catch-all routes
 app.get('/*splat', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-// FIX: Change 127.0.0.1 to 0.0.0.0 for Render compatibility
+// 6. START THE SERVER (Bound to 0.0.0.0 for Render)
 const port = process.env.PORT || 3000;
 app.listen(port, '0.0.0.0', () => {
     console.log(`🚀 Mache OS Live on port ${port}`);
