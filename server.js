@@ -93,7 +93,7 @@ const path = require('path');
 app.use(express.static(path.join(__dirname, '.')));
 
 // NEW EXPRESS 5 FORMAT FOR CATCH-ALL
-app.get('/(.*)', (req, res) => {
+app.get('/*splat', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
 
