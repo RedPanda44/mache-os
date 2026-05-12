@@ -1078,8 +1078,7 @@
     <script>
         const OWNER_EMAIL = "an631689@icloud.com";
         // FIX: Dynamic URL targeting for iOS vs Desktop Node.js server
-       const BACKEND_URL = "[https://mache-os.onrender.com](https://mache-os.onrender.com)";
-        
+       const BACKEND_URL = window.location.origin;
         let isLoginMode = true;
         let currentUser = null;
         

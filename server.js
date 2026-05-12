@@ -86,6 +86,20 @@ app.post('/api/flashcards', async (req, res) => {
     }
 });
 
-app.listen(port, () => {
-    console.log(`🔒 Mache Secure Backend running on http://127.0.0.1:${port}`);
+const path = require('path');
+
+// ... keep all your existing AI routes above ...
+
+// NEW: Tell the server to serve your static frontend files
+app.use(express.static(path.join(__dirname, '.')));
+
+// NEW: Fix the "Cannot GET /" by sending the index.html when people visit the link
+app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, 'index.html'));
+});
+
+// FIX: Change 127.0.0.1 to 0.0.0.0 for Render compatibility
+const port = process.env.PORT || 3000;
+app.listen(port, '0.0.0.0', () => {
+    console.log(`🚀 Mache OS Live on port ${port}`);
 });
