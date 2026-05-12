@@ -92,8 +92,8 @@ const path = require('path');
 // NEW: Tell the server to serve your static frontend files
 app.use(express.static(path.join(__dirname, '.')));
 
-// NEW: Fix the "Cannot GET /" by sending the index.html when people visit the link
-app.get('*', (req, res) => {
+// NEW WAY (Required for the latest version of Express)
+app.get('/*', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
 
