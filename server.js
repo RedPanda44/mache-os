@@ -92,8 +92,8 @@ const path = require('path');
 // NEW: Tell the server to serve your static frontend files
 app.use(express.static(path.join(__dirname, '.')));
 
-// NEW WAY (Required for the latest version of Express)
-app.get('/*', (req, res) => {
+// NEW EXPRESS 5 FORMAT FOR CATCH-ALL
+app.get('/(.*)', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
 
