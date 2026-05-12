@@ -588,7 +588,9 @@
             <div class="landing-nav-links">
                 <a href="#features" class="landing-nav-link">Features</a>
                 <a href="#about" class="landing-nav-link">Infrastructure</a>
-                <a onclick="switchAuth(true)" class="landing-nav-link">Sign In</a>
+                
+                <!-- FIX: Added cursor styling -->
+                <a onclick="switchAuth(true)" class="landing-nav-link" style="cursor: pointer;">Sign In</a>
                 <button class="btn btn-primary" onclick="switchAuth(false)">Get Started</button>
             </div>
         </nav>
@@ -599,7 +601,7 @@
             </div>
 
             <div style="background: rgba(94, 129, 255, 0.05); border: 1px solid var(--border-subtle); border-radius: 16px; padding: 12px 24px; margin-bottom: 32px; display: inline-block; animation: fadeSlideUp 0.8s var(--ease) forwards 0.3s; opacity: 0; backdrop-filter: blur(10px);">
-                <span style="color: var(--accent-blue); font-weight: 700; margin-right: 8px;">🚀 LATEST UPDATE:</span>
+                <span style="color: var(--accent-blue); font-weight: 700; margin-right: 8px;">🚀 LATEST UPDATE (May 12, 2026):</span>
                 <span style="color: var(--text-muted); font-size: 14px;">Aesthetic Custom Animations, UI Polish!</span>
             </div>
 
@@ -677,7 +679,6 @@
                             <input type="text" id="auth-name" class="auth-input-with-icon" autocomplete="off" placeholder="John Doe">
                         </div>
                         
-                        <!-- THE NEW AESTHETIC ANIMATED CHECKBOX -->
                         <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px;">
                             <input type="checkbox" id="tos-check" style="display: none;">
                             <label for="tos-check" class="custom-checkbox"><i class="ph-bold ph-check"></i></label>
@@ -753,7 +754,6 @@
 
     <!-- ==================== MAIN APPLICATION ==================== -->
     <div id="app-screen" class="screen">
-        <!-- Sidebar overlay for Mobile -->
         <div class="sidebar-overlay" id="sidebar-overlay" onclick="toggleSidebar()"></div>
         
         <aside class="sidebar" id="main-sidebar">
@@ -964,7 +964,7 @@
                                 <div id="fc-object" class="flashcard-object" onclick="flipCard()">
                                     <div class="flashcard-face flashcard-front">
                                         <div class="fc-label">Question <span id="fc-progress"></span></div>
-                                        <div class="fc-text" id="fc-q">Select a document above and click "Generate".</div>
+                                        <div class="fc-text" id="fc-q">Select a document above and click "Generate" to start studying.</div>
                                     </div>
                                     <div class="flashcard-face flashcard-back">
                                         <div class="fc-label" style="color: white;">Answer</div>
@@ -1077,14 +1077,22 @@
     <!-- --- SCRIPTS --- -->
     <script>
         const OWNER_EMAIL = "an631689@icloud.com";
+        // FIX: Dynamic URL targeting for iOS vs Desktop Node.js server
+       const BACKEND_URL = "[https://mache-os.onrender.com](https://mache-os.onrender.com)";
+        
         let isLoginMode = true;
         let currentUser = null;
         
         let appData = {
             profile: { dob: '', phone: '', photo: '' },
-            tasks: [], goals: [], settings: { currency: 'USD', theme: 'dark' }, finance: { checking: 0, savings: 0, transactions: [] },
+            tasks: [], 
+            goals: [], 
+            settings: { currency: 'USD', theme: 'dark' }, 
+            finance: { checking: 0, savings: 0, transactions: [] },
             chatHistory: [{ role: "ai", text: "Welcome back! I am Gemini, your Personal AI. How can I assist you today?" }],
-            savedChats: [], notes: [], flashcards: {}
+            savedChats: [], 
+            notes: [], 
+            flashcards: {}
         };
 
         const formatMoney = (amount) => {
@@ -1107,6 +1115,7 @@
             if (stored) {
                 try {
                     currentUser = JSON.parse(stored);
+                    
                     let db = JSON.parse(localStorage.getItem('macheUsersDB')) || {};
                     if(currentUser && currentUser.email === OWNER_EMAIL && currentUser.role !== 'owner') {
                         currentUser.role = 'owner';
@@ -1121,7 +1130,9 @@
                         syncRoleUI();
                         showScreen('app-screen');
                         navigate('dashboard');
-                    } else { throw new Error("Invalid User Data"); }
+                    } else {
+                        throw new Error("Invalid User Data");
+                    }
                 } catch (e) {
                     console.error("Init Error:", e);
                     showScreen(isPWA ? 'auth-screen' : 'landing-screen');
@@ -1142,12 +1153,14 @@
             showScreen('loading-screen');
             const textEl = document.getElementById('loading-text');
             const barFill = document.getElementById('loading-bar-fill');
+            
             if(barFill) { barFill.style.transition = 'none'; barFill.style.width = '0%'; }
             
             let duration = type === 'signup' ? 5500 : 2500;
             let messages = type === 'signup' 
                 ? ["Allocating server space...", "Configuring Google Gemini AI...", "Generating financial ledgers...", "Applying aesthetic preferences...", "Finalizing your Personal OS..."]
                 : ["Authenticating credentials...", "Decrypting workspace...", "Loading modules..."];
+
             if (type === 'logout') messages = ["Archiving chat history...", "Encrypting data...", "Signing out safely..."];
 
             if(barFill) setTimeout(() => { barFill.style.transition = `width ${duration}ms linear`; barFill.style.width = '100%'; }, 50);
@@ -1164,8 +1177,16 @@
                 }
             }, intervalTime);
 
-            const safety = setTimeout(() => { showScreen('app-screen'); navigate('dashboard'); }, duration + 1000);
-            setTimeout(() => { clearInterval(textInterval); clearTimeout(safety); if(callback) callback(); }, duration);
+            const safety = setTimeout(() => { 
+                showScreen('app-screen'); 
+                navigate('dashboard'); 
+            }, duration + 1000);
+
+            setTimeout(() => { 
+                clearInterval(textInterval); 
+                clearTimeout(safety);
+                if(callback) callback();
+            }, duration);
         }
 
         function toggleSidebar() {
@@ -1179,15 +1200,23 @@
             const theme = appData.settings.theme || 'dark';
             document.documentElement.setAttribute('data-theme', theme);
             const btn = document.getElementById('theme-toggle-btn');
-            if (btn) btn.innerHTML = theme === 'light' ? `<i class="ph-bold ph-moon"></i> Switch to Dark Mode` : `<i class="ph-bold ph-sun"></i> Switch to Light Mode`;
+            if (btn) {
+                if (theme === 'light') {
+                    btn.innerHTML = `<i class="ph-bold ph-moon"></i> Switch to Dark Mode`;
+                } else {
+                    btn.innerHTML = `<i class="ph-bold ph-sun"></i> Switch to Light Mode`;
+                }
+            }
         }
 
         function toggleTheme() {
             if(!appData.settings) appData.settings = {};
             appData.settings.theme = appData.settings.theme === 'light' ? 'dark' : 'light';
-            saveData(); applyTheme();
+            saveData();
+            applyTheme();
         }
 
+        // --- AUTH ---
         function switchAuth(login) {
             isLoginMode = login;
             const fields = document.getElementById('signup-fields');
@@ -1205,8 +1234,14 @@
                 if(nameInput) nameInput.setAttribute('required', 'true'); 
                 if(tosCheck) tosCheck.setAttribute('required', 'true');
             }
+            
             if(title) title.innerText = isLoginMode ? 'Welcome Back' : 'Create Account';
+            
+            // FIX: Uses innerText to preserve the arrow icon formatting safely
             if(btnText) btnText.innerText = isLoginMode ? 'Sign In' : 'Create Account';
+            
+            // FIX: Tells the app to actually switch to the screen
+            showScreen('auth-screen');
         }
 
         function toggleAuthMode() { switchAuth(!isLoginMode); }
@@ -1216,16 +1251,21 @@
             
             if (!isLoginMode) {
                 const tosCheck = document.getElementById('tos-check');
-                if (tosCheck && !tosCheck.checked) return alert("You must agree to the Terms and Services to create an account.");
+                if (tosCheck && !tosCheck.checked) {
+                    alert("You must agree to the Terms and Services to create an account.");
+                    return;
+                }
             }
 
             const emailInput = document.getElementById('auth-email');
             const passInput = document.getElementById('auth-pass');
             const logo = document.getElementById('auth-logo');
+            
             if(!emailInput || !passInput) return;
 
             const email = emailInput.value.trim().toLowerCase();
             const pass = passInput.value;
+
             if(logo) logo.classList.add('logo-hyperdrive');
 
             setTimeout(() => {
@@ -1233,140 +1273,246 @@
                 
                 if (isLoginMode) {
                     const profile = db[email];
-                    if (!profile) { alert("Account not found."); if(logo) logo.classList.remove('logo-hyperdrive'); return; }
+                    
+                    if (!profile) {
+                        alert("Account not found. Please create an account first.");
+                        if(logo) logo.classList.remove('logo-hyperdrive');
+                        return;
+                    }
 
-                    if (profile.password && profile.password !== pass) { alert("Incorrect password."); if(logo) logo.classList.remove('logo-hyperdrive'); return; } 
-                    else if (!profile.password) { profile.password = pass; db[email] = profile; localStorage.setItem('macheUsersDB', JSON.stringify(db)); }
+                    if (profile.password && profile.password !== pass) {
+                        alert("Incorrect password. Please try again.");
+                        if(logo) logo.classList.remove('logo-hyperdrive');
+                        return;
+                    } else if (!profile.password) {
+                        profile.password = pass;
+                        db[email] = profile;
+                        localStorage.setItem('macheUsersDB', JSON.stringify(db));
+                    }
 
-                    currentUser = { email, name: profile.name || email.split('@')[0], role: (email === OWNER_EMAIL) ? 'owner' : (profile.role || 'client'), hasAIAccess: profile.hasAIAccess || false };
+                    currentUser = { 
+                        email, 
+                        name: profile.name || email.split('@')[0],
+                        role: (email === OWNER_EMAIL) ? 'owner' : (profile.role || 'client'), 
+                        hasAIAccess: profile.hasAIAccess || false 
+                    };
                     
                     if(logo) logo.classList.remove('logo-hyperdrive');
                     triggerLoadingScreen('login', () => {
                         localStorage.setItem('macheUser', JSON.stringify(currentUser));
-                        loadLocalData(); syncRoleUI(); showScreen('app-screen'); navigate('dashboard');
+                        loadLocalData(); 
+                        syncRoleUI(); 
+                        showScreen('app-screen'); 
+                        navigate('dashboard');
                     });
                 } else {
-                    if (db[email]) { alert("An account with this email already exists."); if(logo) logo.classList.remove('logo-hyperdrive'); return; }
+                    if (db[email]) {
+                        alert("An account with this email already exists. Please sign in.");
+                        if(logo) logo.classList.remove('logo-hyperdrive');
+                        return;
+                    }
 
                     const nameInput = document.getElementById('auth-name');
                     const name = (nameInput && nameInput.value.trim() !== "") ? nameInput.value.trim() : email.split('@')[0];
+                    
                     currentUser = { email, name, role: (email === OWNER_EMAIL) ? 'owner' : 'client', hasAIAccess: false };
+                    
                     db[email] = { ...currentUser, password: pass };
-                    localStorage.setItem('macheUsersDB', JSON.stringify(db)); localStorage.setItem('macheUser', JSON.stringify(currentUser));
+                    localStorage.setItem('macheUsersDB', JSON.stringify(db));
+                    localStorage.setItem('macheUser', JSON.stringify(currentUser));
                     
                     if(logo) logo.classList.remove('logo-hyperdrive');
                     showScreen('questionnaire-screen');
                 }
-                const authForm = document.getElementById('auth-form'); if(authForm) authForm.reset();
+                const authForm = document.getElementById('auth-form');
+                if(authForm) authForm.reset();
             }, 1200); 
         }
 
         function selectCard(card) {
             document.querySelectorAll('.option-card').forEach(el => el.classList.remove('active'));
             card.classList.add('active');
-            const hd = document.getElementById('q-goal-hidden'); if(hd) hd.value = card.getAttribute('data-val');
+            const hd = document.getElementById('q-goal-hidden');
+            if(hd) hd.value = card.getAttribute('data-val');
         }
 
         function submitQuestionnaire() { triggerLoadingScreen('signup', () => { showScreen('onboarding-screen'); }); }
-        function finishOnboarding() { loadLocalData(); syncRoleUI(); showScreen('app-screen'); navigate('dashboard'); }
+        
+        function finishOnboarding() { 
+            loadLocalData(); 
+            syncRoleUI(); 
+            showScreen('app-screen'); 
+            navigate('dashboard'); 
+        }
 
         function syncRoleUI() {
             if(!currentUser) return;
+
             const isStaff = ['owner', 'admin', 'manager', 'supervisor'].includes(currentUser.role);
-            const mgmtNav = document.getElementById('mgmt-nav'); if (mgmtNav) mgmtNav.style.display = isStaff ? 'block' : 'none';
-            const nameDisplay = document.getElementById('user-display-name'); if (nameDisplay) nameDisplay.innerText = currentUser.name || "User";
+            const mgmtNav = document.getElementById('mgmt-nav');
+            if (mgmtNav) mgmtNav.style.display = isStaff ? 'block' : 'none';
+            
+            const nameDisplay = document.getElementById('user-display-name');
+            if (nameDisplay) nameDisplay.innerText = currentUser.name || "User";
+            
             const badge = document.getElementById('user-role-badge');
-            if (badge) { badge.innerText = (currentUser.role || "Client").toUpperCase(); badge.style.color = currentUser.role === 'owner' ? 'var(--accent-purple)' : 'var(--accent-blue)'; }
+            if (badge) {
+                badge.innerText = (currentUser.role || "Client").toUpperCase();
+                badge.style.color = currentUser.role === 'owner' ? 'var(--accent-purple)' : 'var(--accent-blue)';
+            }
+            
             const avatarDiv = document.getElementById('user-avatar');
             if (avatarDiv) {
-                if (appData && appData.profile && appData.profile.photo) { avatarDiv.style.backgroundImage = `url(${appData.profile.photo})`; avatarDiv.innerText = ""; } 
-                else { avatarDiv.style.backgroundImage = "none"; avatarDiv.innerText = (currentUser.name || "U").substring(0,2).toUpperCase(); }
+                if (appData && appData.profile && appData.profile.photo) {
+                    avatarDiv.style.backgroundImage = `url(${appData.profile.photo})`;
+                    avatarDiv.innerText = "";
+                } else {
+                    avatarDiv.style.backgroundImage = "none";
+                    avatarDiv.innerText = (currentUser.name || "U").substring(0,2).toUpperCase();
+                }
             }
+            
             if (isStaff) { renderClients(); renderTickets(); }
-            const paywall = document.getElementById('ai-paywall-screen'); if (paywall) paywall.style.display = currentUser.hasAIAccess ? 'none' : 'flex';
+            const paywall = document.getElementById('ai-paywall-screen');
+            if (paywall) paywall.style.display = currentUser.hasAIAccess ? 'none' : 'flex';
+            
             applyTheme();
         }
 
         function openProfileModal() {
             if(!currentUser) return;
-            const pName = document.getElementById('prof-name'); const pDob = document.getElementById('prof-dob'); const pPhone = document.getElementById('prof-phone');
-            if(pName) pName.value = currentUser.name || ''; if(pDob && appData.profile) pDob.value = appData.profile.dob || ''; if(pPhone && appData.profile) pPhone.value = appData.profile.phone || '';
-            const pre = document.getElementById('modal-avatar-preview'); const init = document.getElementById('modal-avatar-initials');
+            const pName = document.getElementById('prof-name');
+            const pDob = document.getElementById('prof-dob');
+            const pPhone = document.getElementById('prof-phone');
+            
+            if(pName) pName.value = currentUser.name || '';
+            if(pDob && appData.profile) pDob.value = appData.profile.dob || '';
+            if(pPhone && appData.profile) pPhone.value = appData.profile.phone || '';
+            
+            const pre = document.getElementById('modal-avatar-preview');
+            const init = document.getElementById('modal-avatar-initials');
+            
             if(pre && init) {
-                if(appData.profile && appData.profile.photo) { pre.style.backgroundImage = `url(${appData.profile.photo})`; init.innerText = ''; } 
-                else { pre.style.backgroundImage = 'none'; init.innerText = (currentUser.name || "U").substring(0,2).toUpperCase(); }
+                if(appData.profile && appData.profile.photo) {
+                    pre.style.backgroundImage = `url(${appData.profile.photo})`;
+                    init.innerText = '';
+                } else {
+                    pre.style.backgroundImage = 'none';
+                    init.innerText = (currentUser.name || "U").substring(0,2).toUpperCase();
+                }
             }
-            const modal = document.getElementById('profile-modal'); if(modal) modal.classList.add('active');
+
+            const modal = document.getElementById('profile-modal');
+            if(modal) modal.classList.add('active');
         }
 
-        function closeProfileModal() { const modal = document.getElementById('profile-modal'); if(modal) modal.classList.remove('active'); }
+        function closeProfileModal() {
+            const modal = document.getElementById('profile-modal');
+            if(modal) modal.classList.remove('active');
+        }
 
         function handleAvatarUpload(e) {
-            const file = e.target.files[0]; if(!file) return;
+            const file = e.target.files[0];
+            if(!file) return;
             const reader = new FileReader();
             reader.onload = function(evt) {
                 if(!appData.profile) appData.profile = {};
                 appData.profile.photo = evt.target.result;
-                const pre = document.getElementById('modal-avatar-preview'); const init = document.getElementById('modal-avatar-initials');
-                if(pre) pre.style.backgroundImage = `url(${appData.profile.photo})`; if(init) init.innerText = '';
+                const pre = document.getElementById('modal-avatar-preview');
+                const init = document.getElementById('modal-avatar-initials');
+                if(pre) pre.style.backgroundImage = `url(${appData.profile.photo})`;
+                if(init) init.innerText = '';
             };
             reader.readAsDataURL(file);
         }
 
         function saveProfile() {
-            const nameInput = document.getElementById('prof-name'); if(!nameInput) return;
-            const newName = nameInput.value.trim(); if(!newName) return alert("Name cannot be empty.");
-            currentUser.name = newName; if(!appData.profile) appData.profile = {};
-            const dob = document.getElementById('prof-dob'); const phone = document.getElementById('prof-phone');
-            if(dob) appData.profile.dob = dob.value; if(phone) appData.profile.phone = phone.value;
+            const nameInput = document.getElementById('prof-name');
+            if(!nameInput) return;
+            
+            const newName = nameInput.value.trim();
+            if(!newName) return alert("Name cannot be empty.");
+            
+            currentUser.name = newName;
+            if(!appData.profile) appData.profile = {};
+            
+            const dob = document.getElementById('prof-dob');
+            const phone = document.getElementById('prof-phone');
+            if(dob) appData.profile.dob = dob.value;
+            if(phone) appData.profile.phone = phone.value;
 
             let db = JSON.parse(localStorage.getItem('macheUsersDB')) || {};
             if(db[currentUser.email]) db[currentUser.email].name = newName;
-            localStorage.setItem('macheUsersDB', JSON.stringify(db)); localStorage.setItem('macheUser', JSON.stringify(currentUser));
-            saveData(); syncRoleUI(); closeProfileModal();
+            localStorage.setItem('macheUsersDB', JSON.stringify(db));
+            localStorage.setItem('macheUser', JSON.stringify(currentUser));
+            
+            saveData();
+            syncRoleUI();
+            closeProfileModal();
         }
 
         function deleteAccount() {
             if(currentUser.email === OWNER_EMAIL) return alert("System Guard: Cannot delete the OS Owner account.");
             if(confirm("Are you absolutely sure you want to PERMANENTLY delete your account and all data? This cannot be undone.")) {
-                let db = JSON.parse(localStorage.getItem('macheUsersDB')) || {}; delete db[currentUser.email];
-                localStorage.setItem('macheUsersDB', JSON.stringify(db)); localStorage.removeItem(`macheData_${currentUser.email}`);
-                localStorage.removeItem('macheUser'); location.reload();
+                let db = JSON.parse(localStorage.getItem('macheUsersDB')) || {};
+                delete db[currentUser.email];
+                localStorage.setItem('macheUsersDB', JSON.stringify(db));
+                localStorage.removeItem(`macheData_${currentUser.email}`);
+                localStorage.removeItem('macheUser');
+                location.reload();
             }
         }
 
         function navigate(viewId) {
-            const protectedViews = ['clients', 'tickets']; const isStaff = ['owner', 'admin', 'manager', 'supervisor'].includes(currentUser.role);
+            const protectedViews = ['clients', 'tickets'];
+            const isStaff = ['owner', 'admin', 'manager', 'supervisor'].includes(currentUser.role);
             if (protectedViews.includes(viewId) && !isStaff) return alert("Access Denied.");
 
-            document.querySelectorAll('.nav-item').forEach(i => { if (i.dataset.target === viewId) i.classList.add('active'); else i.classList.remove('active'); });
+            document.querySelectorAll('.nav-item').forEach(i => {
+                if (i.dataset.target === viewId) i.classList.add('active');
+                else i.classList.remove('active');
+            });
+
             document.querySelectorAll('.view-section').forEach(v => {
-                v.classList.remove('active'); if(v.id === `view-${viewId}`) setTimeout(() => v.classList.add('active'), 10);
+                v.classList.remove('active');
+                if(v.id === `view-${viewId}`) setTimeout(() => v.classList.add('active'), 10);
             });
             
             if(window.innerWidth <= 768) {
-                const sb = document.getElementById('main-sidebar'); const overlay = document.getElementById('sidebar-overlay');
-                if(sb) sb.classList.remove('open'); if(overlay) overlay.classList.remove('active');
+                const sb = document.getElementById('main-sidebar');
+                const overlay = document.getElementById('sidebar-overlay');
+                if(sb) sb.classList.remove('open');
+                if(overlay) overlay.classList.remove('active');
             }
-            if(viewId === 'assistant') scrollToChatBottom(); if(viewId === 'study') renderStudyNotes(); if(viewId === 'dashboard') renderDashboard();
+
+            if(viewId === 'assistant') scrollToChatBottom();
+            if(viewId === 'study') renderStudyNotes();
+            if(viewId === 'dashboard') renderDashboard();
         }
 
         function exportData() {
             const allData = {};
             for (let i = 0; i < localStorage.length; i++) {
-                const key = localStorage.key(i); if (key.startsWith('mache')) { allData[key] = localStorage.getItem(key); }
+                const key = localStorage.key(i);
+                if (key.startsWith('mache')) { allData[key] = localStorage.getItem(key); }
             }
-            const dataStr = JSON.stringify(allData, null, 2); const blob = new Blob([dataStr], { type: "application/json" });
-            const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = `mache_backup_${new Date().toISOString().split('T')[0]}.json`;
+            const dataStr = JSON.stringify(allData, null, 2);
+            const blob = new Blob([dataStr], { type: "application/json" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a'); a.href = url; a.download = `mache_backup_${new Date().toISOString().split('T')[0]}.json`;
             document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
         }
 
         function importData(e) {
-            const file = e.target.files[0]; if(!file) return; const reader = new FileReader();
+            const file = e.target.files[0]; if(!file) return;
+            const reader = new FileReader();
             reader.onload = function(evt) {
                 try {
-                    const data = JSON.parse(evt.target.result); let count = 0;
-                    for (const key in data) { if (key.startsWith('mache')) { localStorage.setItem(key, data[key]); count++; } }
+                    const data = JSON.parse(evt.target.result);
+                    let count = 0;
+                    for (const key in data) {
+                        if (key.startsWith('mache')) { localStorage.setItem(key, data[key]); count++; }
+                    }
                     if (count > 0) { alert("Backup restored successfully! Mache will now reload."); location.reload(); } 
                     else { alert("No valid Mache data found in this file."); }
                 } catch (err) { alert("Error importing file. Make sure it is a valid Mache backup."); }
@@ -1375,227 +1521,546 @@
         }
 
         function loadLocalData() {
-            if (!currentUser) return; const saved = localStorage.getItem(`macheData_${currentUser.email}`);
+            if (!currentUser) return;
+            const saved = localStorage.getItem(`macheData_${currentUser.email}`);
+            
             try {
                 if(saved) {
-                    const parsed = JSON.parse(saved); appData.profile = parsed.profile || { dob: '', phone: '', photo: '' };
-                    appData.tasks = Array.isArray(parsed.tasks) ? parsed.tasks : []; appData.goals = Array.isArray(parsed.goals) ? parsed.goals : [];
-                    appData.finance = parsed.finance || { checking: 0, savings: 0, transactions: [] }; appData.settings = parsed.settings || { currency: 'USD', theme: 'dark' };
-                    appData.savedChats = Array.isArray(parsed.savedChats) ? parsed.savedChats : []; appData.notes = Array.isArray(parsed.notes) ? parsed.notes : [];
+                    const parsed = JSON.parse(saved);
+                    appData.profile = parsed.profile || { dob: '', phone: '', photo: '' };
+                    appData.tasks = Array.isArray(parsed.tasks) ? parsed.tasks : [];
+                    appData.goals = Array.isArray(parsed.goals) ? parsed.goals : [];
+                    appData.finance = parsed.finance || { checking: 0, savings: 0, transactions: [] };
+                    appData.settings = parsed.settings || { currency: 'USD', theme: 'dark' };
+                    appData.savedChats = Array.isArray(parsed.savedChats) ? parsed.savedChats : [];
+                    appData.notes = Array.isArray(parsed.notes) ? parsed.notes : [];
                     appData.flashcards = parsed.flashcards || {};
-                    if (parsed.chatHistory && Array.isArray(parsed.chatHistory) && parsed.chatHistory.length > 1) { appData.savedChats.push([...parsed.chatHistory]); }
+                    
+                    if (parsed.chatHistory && Array.isArray(parsed.chatHistory) && parsed.chatHistory.length > 1) {
+                        appData.savedChats.push([...parsed.chatHistory]);
+                    }
                     appData.chatHistory = [{ role: "ai", text: "Welcome back! I am Gemini, your Personal AI. How can I assist you today?" }];
-                } else { throw new Error("No data"); }
+
+                } else {
+                    throw new Error("No data"); 
+                }
             } catch(e) {
-                appData = { profile: { dob: '', phone: '', photo: '' }, tasks: [], goals: [], settings: { currency: 'USD', theme: 'dark' }, finance: { checking: 0, savings: 0, transactions: [] }, savedChats: [], notes: [], flashcards: {}, chatHistory: [{ role: "ai", text: "Hello! I am Gemini. How can I assist you today?" }] };
+                appData = { 
+                    profile: { dob: '', phone: '', photo: '' }, 
+                    tasks: [], goals: [], 
+                    settings: { currency: 'USD', theme: 'dark' }, 
+                    finance: { checking: 0, savings: 0, transactions: [] }, 
+                    savedChats: [], notes: [], flashcards: {}, 
+                    chatHistory: [{ role: "ai", text: "Hello! I am Gemini. How can I assist you today?" }] 
+                };
             }
-            const currencySelect = document.getElementById('fin-currency-select'); if(currencySelect && appData.settings) currencySelect.value = appData.settings.currency || 'USD';
+            
+            const currencySelect = document.getElementById('fin-currency-select');
+            if(currencySelect && appData.settings) currencySelect.value = appData.settings.currency || 'USD';
+            
             renderAll();
         }
 
         function saveData() { if(!currentUser) return; localStorage.setItem(`macheData_${currentUser.email}`, JSON.stringify(appData)); renderAll(); }
-        function renderAll() { renderTasks(); renderGoals(); renderFinance(); renderChatHistory(); renderStudyNotes(); renderDashboard(); applyTheme(); }
+        
+        function renderAll() { 
+            renderTasks(); 
+            renderGoals(); 
+            renderFinance(); 
+            renderChatHistory(); 
+            renderStudyNotes(); 
+            renderDashboard(); 
+            applyTheme(); 
+        }
 
         function renderDashboard() {
             const taskDiv = document.getElementById('widget-tasks');
             if(taskDiv && appData.tasks) {
                 const activeTasks = appData.tasks.filter(t => !t.done).slice(0, 3);
-                if(activeTasks.length > 0) { taskDiv.innerHTML = activeTasks.map(t => `<div style="font-size:13px; padding:8px 12px; background:var(--input-bg); border-radius:8px; border:1px solid var(--border-subtle); display:flex; align-items:center; gap:8px;"><i class="ph-fill ph-check-circle" style="color:var(--text-muted);"></i> <span style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${t.text}</span></div>`).join(''); } 
-                else { taskDiv.innerHTML = `<div style="color:var(--text-muted); font-size:13px; font-style:italic;">No active tasks. You're all caught up!</div>`; }
+                if(activeTasks.length > 0) {
+                    taskDiv.innerHTML = activeTasks.map(t => `<div style="font-size:13px; padding:8px 12px; background:var(--input-bg); border-radius:8px; border:1px solid var(--border-subtle); display:flex; align-items:center; gap:8px;"><i class="ph-fill ph-check-circle" style="color:var(--text-muted);"></i> <span style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${t.text}</span></div>`).join('');
+                } else {
+                    taskDiv.innerHTML = `<div style="color:var(--text-muted); font-size:13px; font-style:italic;">No active tasks. You're all caught up!</div>`;
+                }
             }
-            const countEl = document.getElementById('dash-task-count'); if (countEl && appData.tasks) countEl.innerText = appData.tasks.filter(t=>!t.done).length;
+            
+            const countEl = document.getElementById('dash-task-count');
+            if (countEl && appData.tasks) countEl.innerText = appData.tasks.filter(t=>!t.done).length;
 
             const goalDiv = document.getElementById('widget-goals');
             if(goalDiv && appData.goals) {
                 const topGoals = appData.goals.slice(0, 2);
                 if(topGoals.length > 0) {
-                    goalDiv.innerHTML = topGoals.map(g => `<div><div style="display:flex; justify-content:space-between; font-size:12px; margin-bottom:4px;"><span>${g.text}</span><span style="color:var(--accent-blue);">${g.progress}%</span></div><div style="width:100%; height:4px; background:var(--border-subtle); border-radius:2px; overflow:hidden;"><div style="width:${g.progress}%; height:100%; background:linear-gradient(90deg, var(--accent-blue), var(--accent-purple));"></div></div></div>`).join('');
-                } else { goalDiv.innerHTML = `<div style="color:var(--text-muted); font-size:13px; font-style:italic;">No goals defined yet.</div>`; }
+                    goalDiv.innerHTML = topGoals.map(g => `
+                    <div>
+                        <div style="display:flex; justify-content:space-between; font-size:12px; margin-bottom:4px;"><span>${g.text}</span><span style="color:var(--accent-blue);">${g.progress}%</span></div>
+                        <div style="width:100%; height:4px; background:var(--border-subtle); border-radius:2px; overflow:hidden;"><div style="width:${g.progress}%; height:100%; background:linear-gradient(90deg, var(--accent-blue), var(--accent-purple));"></div></div>
+                    </div>`).join('');
+                } else {
+                    goalDiv.innerHTML = `<div style="color:var(--text-muted); font-size:13px; font-style:italic;">No goals defined yet.</div>`;
+                }
             }
+
             if(appData.finance) {
                 const total = (appData.finance.checking || 0) + (appData.finance.savings || 0);
-                const ft = document.getElementById('widget-finance-total'); if(ft) ft.innerText = formatMoney(total);
-                const nwd = document.getElementById('dash-nw-display'); if(nwd) nwd.innerText = formatMoney(total);
+                const ft = document.getElementById('widget-finance-total');
+                if(ft) ft.innerText = formatMoney(total);
+                const nwd = document.getElementById('dash-nw-display');
+                if(nwd) nwd.innerText = formatMoney(total);
             }
         }
 
-        // --- TASKS ---
-        function addTask() { const input = document.getElementById('new-task-input'); if(!input) return; const val = input.value.trim(); if(val) { if(!appData.tasks) appData.tasks = []; appData.tasks.unshift({id: Date.now(), text: val, done: false}); input.value=''; saveData(); } }
+        function addTask() { 
+            const input = document.getElementById('new-task-input');
+            if(!input) return;
+            const val = input.value.trim(); 
+            if(val) { 
+                if(!appData.tasks) appData.tasks = [];
+                appData.tasks.unshift({id: Date.now(), text: val, done: false}); 
+                input.value=''; 
+                saveData(); 
+            } 
+        }
         function toggleTask(id) { if(!appData.tasks) return; const t = appData.tasks.find(x => x.id === id); if(t){ t.done = !t.done; saveData(); } }
         function deleteTask(id) { if(!appData.tasks) return; appData.tasks = appData.tasks.filter(x => x.id !== id); saveData(); }
         function renderTasks() {
             const list = document.getElementById('full-tasks-list');
-            if(list && appData.tasks) { list.innerHTML = appData.tasks.map(t => `<div class="list-item ${t.done?'done':''}"><div class="list-checkbox" onclick="toggleTask(${t.id})">${t.done?'<i class="ph-bold ph-check" style="color:var(--bg-base); font-size:12px;"></i>':''}</div><span style="flex-grow:1" onclick="toggleTask(${t.id})">${t.text}</span><button class="delete-btn" onclick="deleteTask(${t.id})"><i class="ph-bold ph-trash"></i></button></div>`).join('') || '<p style="color:var(--text-muted)">No tasks yet.</p>'; }
+            if(list && appData.tasks) {
+                list.innerHTML = appData.tasks.map(t => `
+                    <div class="list-item ${t.done?'done':''}">
+                        <div class="list-checkbox" onclick="toggleTask(${t.id})">${t.done?'<i class="ph-bold ph-check" style="color:var(--bg-base); font-size:12px;"></i>':''}</div>
+                        <span style="flex-grow:1" onclick="toggleTask(${t.id})">${t.text}</span>
+                        <button class="delete-btn" onclick="deleteTask(${t.id})"><i class="ph-bold ph-trash"></i></button>
+                    </div>
+                `).join('') || '<p style="color:var(--text-muted)">No tasks yet.</p>';
+            }
         }
-        window.addEventListener('DOMContentLoaded', () => { const tInput = document.getElementById('new-task-input'); if(tInput) tInput.addEventListener('keypress', e => { if(e.key==='Enter') addTask(); }); });
+        
+        window.addEventListener('DOMContentLoaded', () => {
+            const tInput = document.getElementById('new-task-input');
+            if(tInput) tInput.addEventListener('keypress', e => { if(e.key==='Enter') addTask(); });
+        });
 
-        // --- GOALS ---
         function addGoal() {
-            const inTxt = document.getElementById('new-goal-input'); const inPrg = document.getElementById('new-goal-prog'); if(!inTxt || !inPrg) return;
-            const txt = inTxt.value.trim(); let prg = parseInt(inPrg.value) || 0; if(prg>100) prg=100;
-            if(txt) { if(!appData.goals) appData.goals = []; appData.goals.unshift({id: Date.now(), text: txt, progress: prg}); inTxt.value=''; inPrg.value='0'; saveData(); }
+            const inTxt = document.getElementById('new-goal-input');
+            const inPrg = document.getElementById('new-goal-prog');
+            if(!inTxt || !inPrg) return;
+            
+            const txt = inTxt.value.trim(); 
+            let prg = parseInt(inPrg.value) || 0; 
+            if(prg>100) prg=100;
+            
+            if(txt) { 
+                if(!appData.goals) appData.goals = [];
+                appData.goals.unshift({id: Date.now(), text: txt, progress: prg}); 
+                inTxt.value=''; 
+                inPrg.value='0'; 
+                saveData(); 
+            }
         }
         function deleteGoal(id) { if(!appData.goals) return; appData.goals = appData.goals.filter(x => x.id !== id); saveData(); }
         function renderGoals() {
             const list = document.getElementById('full-goals-list');
-            if(list && appData.goals) { list.innerHTML = appData.goals.map(g => `<div style="width:100%;"><div style="display:flex; justify-content:space-between; margin-bottom:8px;"><span style="font-size:15px; font-weight:600;">${g.text}</span><div style="display:flex; gap:12px; align-items:center;"><span style="font-size:14px; color:var(--accent-blue); font-weight:700;">${g.progress}%</span><button class="delete-btn" onclick="deleteGoal(${g.id})" style="opacity:1"><i class="ph-bold ph-trash"></i></button></div></div><div class="progress-container"><div class="progress-fill" style="width:${g.progress}%"></div></div></div>`).join('') || '<p style="color:var(--text-muted)">No goals set.</p>'; }
+            if(list && appData.goals) {
+                list.innerHTML = appData.goals.map(g => `
+                    <div style="width:100%;">
+                        <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
+                            <span style="font-size:15px; font-weight:600;">${g.text}</span>
+                            <div style="display:flex; gap:12px; align-items:center;">
+                                <span style="font-size:14px; color:var(--accent-blue); font-weight:700;">${g.progress}%</span>
+                                <button class="delete-btn" onclick="deleteGoal(${g.id})" style="opacity:1"><i class="ph-bold ph-trash"></i></button>
+                            </div>
+                        </div>
+                        <div class="progress-container"><div class="progress-fill" style="width:${g.progress}%"></div></div>
+                    </div>
+                `).join('') || '<p style="color:var(--text-muted)">No goals set.</p>';
+            }
         }
 
-        // --- FINANCE ---
-        function changeCurrency() { const sel = document.getElementById('fin-currency-select'); if(sel && appData.settings) { appData.settings.currency = sel.value; saveData(); } }
+        function changeCurrency() { 
+            const sel = document.getElementById('fin-currency-select');
+            if(sel && appData.settings) { appData.settings.currency = sel.value; saveData(); }
+        }
         function addTransaction() {
-            const dEl = document.getElementById('fin-desc'); const aEl = document.getElementById('fin-amount'); const tEl = document.getElementById('fin-type');
-            if(!dEl || !aEl || !tEl) return; const desc = dEl.value.trim(); const amount = parseFloat(aEl.value); const type = tEl.value;
+            const dEl = document.getElementById('fin-desc');
+            const aEl = document.getElementById('fin-amount');
+            const tEl = document.getElementById('fin-type');
+            if(!dEl || !aEl || !tEl) return;
+            
+            const desc = dEl.value.trim(); 
+            const amount = parseFloat(aEl.value); 
+            const type = tEl.value;
+            
             if(!desc || isNaN(amount) || amount <= 0) return alert("Invalid details.");
-            if(!appData.finance) appData.finance = { checking:0, savings:0, transactions:[] }; if(!appData.finance.transactions) appData.finance.transactions = [];
-            if(type === 'expense') appData.finance.checking -= amount; else if(type === 'income') appData.finance.checking += amount; else if(type === 'transfer') { appData.finance.checking -= amount; appData.finance.savings += amount; }
-            appData.finance.transactions.unshift({ id: Date.now(), desc, amount, type, date: "Just now" }); if(appData.finance.transactions.length > 10) appData.finance.transactions.pop();
+            
+            if(!appData.finance) appData.finance = { checking:0, savings:0, transactions:[] };
+            if(!appData.finance.transactions) appData.finance.transactions = [];
+
+            if(type === 'expense') appData.finance.checking -= amount; 
+            else if(type === 'income') appData.finance.checking += amount; 
+            else if(type === 'transfer') { appData.finance.checking -= amount; appData.finance.savings += amount; }
+            
+            appData.finance.transactions.unshift({ id: Date.now(), desc, amount, type, date: "Just now" });
+            if(appData.finance.transactions.length > 10) appData.finance.transactions.pop();
+            
             dEl.value = ''; aEl.value = ''; saveData();
         }
         function renderFinance() {
-            if(!appData.finance) return; const total = (appData.finance.checking || 0) + (appData.finance.savings || 0);
-            const elTot = document.getElementById('fin-total'); const elChk = document.getElementById('fin-checking'); const elSav = document.getElementById('fin-savings');
-            if(elTot) elTot.innerText = formatMoney(total); if(elChk) elChk.innerText = formatMoney(appData.finance.checking || 0); if(elSav) elSav.innerText = formatMoney(appData.finance.savings || 0);
+            if(!appData.finance) return;
+            const total = (appData.finance.checking || 0) + (appData.finance.savings || 0);
+            const elTot = document.getElementById('fin-total');
+            const elChk = document.getElementById('fin-checking');
+            const elSav = document.getElementById('fin-savings');
+            
+            if(elTot) elTot.innerText = formatMoney(total); 
+            if(elChk) elChk.innerText = formatMoney(appData.finance.checking || 0); 
+            if(elSav) elSav.innerText = formatMoney(appData.finance.savings || 0);
+            
             const tList = document.getElementById('fin-transactions-list');
             if(tList && appData.finance.transactions) {
                 tList.innerHTML = appData.finance.transactions.map(t => {
-                    const isIncome = t.type === 'income'; const isTransfer = t.type === 'transfer'; const icon = isIncome ? 'ph-arrow-down-left' : (isTransfer ? 'ph-arrows-left-right' : 'ph-arrow-up-right');
-                    return `<div class="list-item" style="cursor:default;"><div class="list-checkbox" style="border:none; background:var(--hover-bg); font-size:20px; width:40px; height:40px;"><i class="ph-bold ${icon}"></i></div><div style="flex-grow:1;"><div style="font-weight:600;font-size:15px;">${t.desc}</div><div style="color:var(--text-muted); font-size:12px; margin-top:4px;">${t.date}</div></div><div style="font-size:16px; font-weight:700; color:${isIncome?'var(--success)':'var(--text-main)'}">${isIncome?'+':'-'}${formatMoney(t.amount)}</div></div>`;
+                    const isIncome = t.type === 'income'; const isTransfer = t.type === 'transfer';
+                    const icon = isIncome ? 'ph-arrow-down-left' : (isTransfer ? 'ph-arrows-left-right' : 'ph-arrow-up-right');
+                    return `
+                    <div class="list-item" style="cursor:default;">
+                        <div class="list-checkbox" style="border:none; background:var(--hover-bg); font-size:20px; width:40px; height:40px;"><i class="ph-bold ${icon}"></i></div>
+                        <div style="flex-grow:1;"><div style="font-weight:600;font-size:15px;">${t.desc}</div><div style="color:var(--text-muted); font-size:12px; margin-top:4px;">${t.date}</div></div>
+                        <div style="font-size:16px; font-weight:700; color:${isIncome?'var(--success)':'var(--text-main)'}">${isIncome?'+':'-'}${formatMoney(t.amount)}</div>
+                    </div>`;
                 }).join('') || `<p style="color:var(--text-muted); font-size:14px;">No transactions yet.</p>`;
             }
         }
 
-        // --- STUDY HUB ---
         function setupDragAndDrop() {
-            const dropZone = document.getElementById('drop-zone'); if(!dropZone) return;
+            const dropZone = document.getElementById('drop-zone');
+            if(!dropZone) return;
             dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('dragover'); });
             dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
-            dropZone.addEventListener('drop', (e) => { e.preventDefault(); dropZone.classList.remove('dragover'); if (e.dataTransfer.files.length) processFile(e.dataTransfer.files[0]); });
+            dropZone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                dropZone.classList.remove('dragover');
+                if (e.dataTransfer.files.length) processFile(e.dataTransfer.files[0]);
+            });
         }
-        function handleFileUpload(e) { if (e.target.files.length) processFile(e.target.files[0]); }
+
+        function handleFileUpload(e) {
+            if (e.target.files.length) processFile(e.target.files[0]);
+        }
+
         function processFile(file) {
-            const ext = file.name.split('.').pop().toLowerCase(); const nt = document.getElementById('note-title'); if(nt) nt.value = file.name.replace(/\.[^/.]+$/, ""); 
-            const btn = document.getElementById('save-note-btn'); if(btn) { btn.innerHTML = `<i class="ph-bold ph-spinner"></i> Extracting Text...`; btn.disabled = true; }
+            const ext = file.name.split('.').pop().toLowerCase();
+            const nt = document.getElementById('note-title');
+            if(nt) nt.value = file.name.replace(/\.[^/.]+$/, ""); 
+            
+            const btn = document.getElementById('save-note-btn');
+            if(btn) { btn.innerHTML = `<i class="ph-bold ph-spinner"></i> Extracting Text...`; btn.disabled = true; }
+
             const nc = document.getElementById('note-content');
-            if (ext === 'txt') { const reader = new FileReader(); reader.onload = (e) => { if(nc) nc.value = e.target.result; resetSaveBtn(); }; reader.readAsText(file); } 
-            else if (ext === 'docx') {
-                if(typeof mammoth === 'undefined') { alert("System Error: Mammoth.js Library failed to load."); resetSaveBtn(); return; }
+
+            if (ext === 'txt') {
                 const reader = new FileReader();
-                reader.onload = function(loadEvent) { mammoth.extractRawText({arrayBuffer: loadEvent.target.result}).then(function(result){ if(nc) nc.value = result.value; resetSaveBtn(); }).catch(function(err){ console.error(err); alert("Failed to extract text from this .docx file."); resetSaveBtn(); }); };
+                reader.onload = (e) => {
+                    if(nc) nc.value = e.target.result;
+                    resetSaveBtn();
+                };
+                reader.readAsText(file);
+            } else if (ext === 'docx') {
+                if(typeof mammoth === 'undefined') {
+                    alert("System Error: Mammoth.js Library failed to load. Please check your internet connection.");
+                    resetSaveBtn();
+                    return;
+                }
+                const reader = new FileReader();
+                reader.onload = function(loadEvent) {
+                    const arrayBuffer = loadEvent.target.result;
+                    mammoth.extractRawText({arrayBuffer: arrayBuffer})
+                        .then(function(result){
+                            if(nc) nc.value = result.value;
+                            resetSaveBtn();
+                        })
+                        .catch(function(err){
+                            console.error(err);
+                            alert("Failed to extract text from this .docx file.");
+                            resetSaveBtn();
+                        });
+                };
                 reader.readAsArrayBuffer(file);
-            } else { alert("Unsupported file type."); resetSaveBtn(); }
+            } else {
+                alert("Unsupported file type. Please upload .docx or .txt files only.");
+                resetSaveBtn();
+            }
         }
-        function resetSaveBtn() { const btn = document.getElementById('save-note-btn'); if(btn) { btn.innerHTML = `<i class="ph-bold ph-floppy-disk"></i> Save Document`; btn.disabled = false; } }
+
+        function resetSaveBtn() {
+            const btn = document.getElementById('save-note-btn');
+            if(btn) { btn.innerHTML = `<i class="ph-bold ph-floppy-disk"></i> Save Document`; btn.disabled = false; }
+        }
+
         function saveStudyNote() {
-            const nt = document.getElementById('note-title'); const nc = document.getElementById('note-content'); if(!nt || !nc) return;
-            const title = nt.value.trim(); const text = nc.value.trim(); if(!title || !text) return alert("Please enter both a title and the document text.");
-            if(!appData.notes) appData.notes = []; appData.notes.unshift({ id: Date.now(), title, text }); nt.value = ''; nc.value = ''; saveData();
+            const nt = document.getElementById('note-title');
+            const nc = document.getElementById('note-content');
+            if(!nt || !nc) return;
+
+            const title = nt.value.trim(); 
+            const text = nc.value.trim();
+            if(!title || !text) return alert("Please enter both a title and the document text.");
+            
+            if(!appData.notes) appData.notes = [];
+            appData.notes.unshift({ id: Date.now(), title, text });
+            
+            nt.value = ''; 
+            nc.value = '';
+            saveData();
         }
+
         function renderStudyNotes() {
-            const list = document.getElementById('study-notes-list'); if(!list) return;
-            if(!appData.notes || appData.notes.length === 0) { list.innerHTML = `<p style="color:var(--text-muted); font-size: 14px;">No documents saved yet.</p>`; return; }
+            const list = document.getElementById('study-notes-list');
+            if(!list) return;
+
+            if(!appData.notes || appData.notes.length === 0) {
+                list.innerHTML = `<p style="color:var(--text-muted); font-size: 14px;">No documents saved yet.</p>`;
+                return;
+            }
+
             list.innerHTML = appData.notes.map(note => {
                 const hasCards = appData.flashcards && appData.flashcards[note.id];
-                const btnHTML = hasCards ? `<button class="btn btn-success" style="padding: 6px 12px; font-size: 12px;" onclick="loadFlashcardPlayer(${note.id})"><i class="ph-bold ph-play"></i> Study Now</button>` : `<button class="btn btn-outline" style="padding: 6px 12px; font-size: 12px;" onclick="generateCards(${note.id}, this)"><i class="ph-bold ph-cards"></i> Flashcards</button>`;
-                return `<div class="list-item" style="cursor:default; justify-content: space-between; padding: 16px;"><div><div style="font-weight: 600; font-size: 14px;">${note.title}</div><div style="font-size: 11px; color: var(--text-muted); margin-top:4px;">Document</div></div><div style="display:flex; gap:8px;"><button class="btn btn-outline" style="padding: 6px 12px; font-size: 12px; border-color:var(--accent-blue); color:var(--accent-blue);" onclick="summarizeNote(${note.id}, this)"><i class="ph-bold ph-sparkle"></i> Summarize</button>${btnHTML}</div></div>`;
+                const btnHTML = hasCards 
+                    ? `<button class="btn btn-success" style="padding: 6px 12px; font-size: 12px;" onclick="loadFlashcardPlayer(${note.id})"><i class="ph-bold ph-play"></i> Study Now</button>`
+                    : `<button class="btn btn-outline" style="padding: 6px 12px; font-size: 12px;" onclick="generateCards(${note.id}, this)"><i class="ph-bold ph-cards"></i> Flashcards</button>`;
+                
+                return `
+                <div class="list-item" style="cursor:default; justify-content: space-between; padding: 16px;">
+                    <div>
+                        <div style="font-weight: 600; font-size: 14px;">${note.title}</div>
+                        <div style="font-size: 11px; color: var(--text-muted); margin-top:4px;">Document</div>
+                    </div>
+                    <div style="display:flex; gap:8px;">
+                        <button class="btn btn-outline" style="padding: 6px 12px; font-size: 12px; border-color:var(--accent-blue); color:var(--accent-blue);" onclick="summarizeNote(${note.id}, this)"><i class="ph-bold ph-sparkle"></i> Summarize</button>
+                        ${btnHTML}
+                    </div>
+                </div>`;
             }).join('');
         }
 
         async function summarizeNote(noteId, btnElement) {
-            if(!appData.notes) return; const note = appData.notes.find(n => n.id === noteId); if(!note) return;
-            const originalText = btnElement.innerHTML; btnElement.innerHTML = `<i class="ph-bold ph-spinner"></i> Wait...`; btnElement.disabled = true;
+            if(!appData.notes) return;
+            const note = appData.notes.find(n => n.id === noteId); if(!note) return;
+            const originalText = btnElement.innerHTML;
+            btnElement.innerHTML = `<i class="ph-bold ph-spinner"></i> Wait...`; btnElement.disabled = true;
+
             try {
-                const response = await fetch("http://127.0.0.1:3000/api/chat", { method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify({ newMessage: `Summarize the following document into exactly 3 concise bullet points:\n\n${note.text}`, history: [] }) });
-                if (!response.ok) throw new Error(`HTTP error`); const data = await response.json();
-                if(data.success) { const sumBox = document.getElementById('note-summary-container'); const sumText = document.getElementById('note-summary-text'); if(sumText) sumText.innerText = data.text; if(sumBox) sumBox.style.display = 'block'; } 
-                else { throw new Error(data.error); }
-            } catch(e) { console.error("Summary Error:", e); alert("Summary generation failed."); }
+                const response = await fetch(`${BACKEND_URL}/api/chat`, { 
+                    method: "POST", 
+                    headers: {"Content-Type": "application/json"}, 
+                    body: JSON.stringify({ 
+                        newMessage: `Summarize the following document into exactly 3 concise bullet points:\n\n${note.text}`, 
+                        history: [] 
+                    }) 
+                });
+                
+                if (!response.ok) throw new Error(`HTTP error`);
+                const data = await response.json();
+                
+                if(data.success) {
+                    const sumBox = document.getElementById('note-summary-container');
+                    const sumText = document.getElementById('note-summary-text');
+                    if(sumText) sumText.innerText = data.text;
+                    if(sumBox) sumBox.style.display = 'block';
+                } else { throw new Error(data.error); }
+            } catch(e) {
+                console.error("Summary Error:", e);
+                alert("Summary generation failed. Check your server.");
+            }
             btnElement.innerHTML = originalText; btnElement.disabled = false;
         }
 
-        let currentFlashcards = []; let currentFCIndex = 0;
+        let currentFlashcards = [];
+        let currentFCIndex = 0;
+
         async function generateCards(noteId, btnElement) {
-            if(!appData.notes) return; const note = appData.notes.find(n => n.id === noteId); if(!note) return;
-            btnElement.innerHTML = `<i class="ph-bold ph-spinner"></i> Gen...`; btnElement.disabled = true;
+            if(!appData.notes) return;
+            const note = appData.notes.find(n => n.id === noteId); if(!note) return;
+            btnElement.innerHTML = `<i class="ph-bold ph-spinner"></i> Generating...`; btnElement.disabled = true;
+
             try {
-                const response = await fetch("http://127.0.0.1:3000/api/flashcards", { method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify({ text: note.text }) });
-                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`); const data = await response.json();
-                if(data.success && data.flashcards) { if(!appData.flashcards) appData.flashcards = {}; appData.flashcards[noteId] = data.flashcards; saveData(); loadFlashcardPlayer(noteId); } 
-                else { throw new Error(data.error); }
-            } catch(e) { console.error("Fetch Error:", e); alert("Generation failed. Check server."); btnElement.innerHTML = `<i class="ph-bold ph-cards"></i> Flashcards`; btnElement.disabled = false; }
+                const response = await fetch(`${BACKEND_URL}/api/flashcards`, { 
+                    method: "POST", 
+                    headers: {"Content-Type": "application/json"}, 
+                    body: JSON.stringify({ text: note.text }) 
+                });
+                
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                const data = await response.json();
+                
+                if(data.success && data.flashcards) {
+                    if(!appData.flashcards) appData.flashcards = {};
+                    appData.flashcards[noteId] = data.flashcards;
+                    saveData(); 
+                    loadFlashcardPlayer(noteId);
+                } else { throw new Error(data.error); }
+            } catch(e) {
+                console.error("Fetch Error:", e);
+                alert("Generation failed. Please make sure node server.js is running and check the console.");
+                btnElement.innerHTML = `<i class="ph-bold ph-cards"></i> Flashcards`; btnElement.disabled = false;
+            }
         }
 
         function loadFlashcardPlayer(noteId) {
-            if(!appData.flashcards) return; currentFlashcards = appData.flashcards[noteId]; if(!currentFlashcards || currentFlashcards.length === 0) return;
-            currentFCIndex = 0; const fp = document.getElementById('flashcard-player'); if(fp) fp.classList.add('active'); updateFlashcardUI();
+            if(!appData.flashcards) return;
+            currentFlashcards = appData.flashcards[noteId];
+            if(!currentFlashcards || currentFlashcards.length === 0) return;
+            currentFCIndex = 0;
+            const fp = document.getElementById('flashcard-player');
+            if(fp) fp.classList.add('active');
+            updateFlashcardUI();
         }
+
         function updateFlashcardUI() {
-            const obj = document.getElementById('fc-object'); if(obj) obj.classList.remove('flipped');
-            setTimeout(() => { const q = document.getElementById('fc-q'); const a = document.getElementById('fc-a'); const prog = document.getElementById('fc-progress'); if(q) q.innerText = currentFlashcards[currentFCIndex].q; if(a) a.innerText = currentFlashcards[currentFCIndex].a; if(prog) prog.innerText = `(${currentFCIndex + 1}/${currentFlashcards.length})`; }, 150); 
+            const obj = document.getElementById('fc-object');
+            if(obj) obj.classList.remove('flipped');
+            
+            setTimeout(() => {
+                const q = document.getElementById('fc-q');
+                const a = document.getElementById('fc-a');
+                const prog = document.getElementById('fc-progress');
+                if(q) q.innerText = currentFlashcards[currentFCIndex].q;
+                if(a) a.innerText = currentFlashcards[currentFCIndex].a;
+                if(prog) prog.innerText = `(${currentFCIndex + 1}/${currentFlashcards.length})`;
+            }, 150); 
         }
+
         function flipCard() { const obj = document.getElementById('fc-object'); if(obj) obj.classList.toggle('flipped'); }
         function nextCard() { if(currentFCIndex < currentFlashcards.length - 1) { currentFCIndex++; updateFlashcardUI(); } }
         function prevCard() { if(currentFCIndex > 0) { currentFCIndex--; updateFlashcardUI(); } }
 
-        // --- POMODORO ---
-        let pomoTime = 1500; let pomoInterval = null;
-        function updatePomoDisplay() { const mins = Math.floor(pomoTime / 60).toString().padStart(2, '0'); const secs = (pomoTime % 60).toString().padStart(2, '0'); const disp = document.getElementById('pomo-display'); if(disp) disp.innerText = `${mins}:${secs}`; }
-        function startPomodoro() { if(pomoInterval) return; pomoInterval = setInterval(() => { if(pomoTime > 0) { pomoTime--; updatePomoDisplay(); } else { clearInterval(pomoInterval); pomoInterval = null; alert("Pomodoro Complete! Take a break."); } }, 1000); }
+        // --- STUDY HUB: POMODORO LOGIC ---
+        let pomoTime = 1500; // 25 mins
+        let pomoInterval = null;
+
+        function updatePomoDisplay() {
+            const mins = Math.floor(pomoTime / 60).toString().padStart(2, '0');
+            const secs = (pomoTime % 60).toString().padStart(2, '0');
+            const disp = document.getElementById('pomo-display');
+            if(disp) disp.innerText = `${mins}:${secs}`;
+        }
+        function startPomodoro() {
+            if(pomoInterval) return;
+            pomoInterval = setInterval(() => {
+                if(pomoTime > 0) {
+                    pomoTime--;
+                    updatePomoDisplay();
+                } else {
+                    clearInterval(pomoInterval);
+                    pomoInterval = null;
+                    alert("Pomodoro Complete! Take a break.");
+                }
+            }, 1000);
+        }
         function pausePomodoro() { clearInterval(pomoInterval); pomoInterval = null; }
         function resetPomodoro() { pausePomodoro(); pomoTime = 1500; updatePomoDisplay(); }
 
         // --- SUPPORT & CLIENTS ---
         function submitTicket() {
-            const sEl = document.getElementById('support-subject'); const dEl = document.getElementById('support-desc'); if(!sEl || !dEl || !currentUser) return;
-            const sub = sEl.value.trim(); const desc = dEl.value.trim(); if(!sub || !desc) return alert("Fill out subject and description.");
-            let db = JSON.parse(localStorage.getItem('macheTicketsDB')) || []; db.unshift({ id: Date.now(), email: currentUser.email, name: currentUser.name, subject: sub, desc: desc }); localStorage.setItem('macheTicketsDB', JSON.stringify(db)); sEl.value=''; dEl.value=''; alert("Ticket submitted securely to staff!");
+            const sEl = document.getElementById('support-subject');
+            const dEl = document.getElementById('support-desc');
+            if(!sEl || !dEl || !currentUser) return;
+
+            const sub = sEl.value.trim(); const desc = dEl.value.trim();
+            if(!sub || !desc) return alert("Fill out subject and description.");
+            let db = JSON.parse(localStorage.getItem('macheTicketsDB')) || [];
+            db.unshift({ id: Date.now(), email: currentUser.email, name: currentUser.name, subject: sub, desc: desc });
+            localStorage.setItem('macheTicketsDB', JSON.stringify(db));
+            sEl.value=''; dEl.value='';
+            alert("Ticket submitted securely to staff!");
         }
         function renderTickets() {
-            const tbody = document.getElementById('tickets-table-body'); if(!tbody) return; const db = JSON.parse(localStorage.getItem('macheTicketsDB')) || [];
+            const tbody = document.getElementById('tickets-table-body'); if(!tbody) return;
+            const db = JSON.parse(localStorage.getItem('macheTicketsDB')) || [];
             tbody.innerHTML = db.map(t => `<tr><td><b>${t.name}</b><br><span style="font-size:11px;color:gray">${t.email}</span></td><td style="font-weight:600;">${t.subject}</td><td style="color:var(--text-muted); max-width:200px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="${t.desc}">${t.desc}</td><td><button class="btn btn-success" style="padding:8px 16px; font-size:13px;" onclick="resolveTicket(${t.id})"><i class="ph-bold ph-check"></i> Resolve</button></td></tr>`).join('') || `<tr><td colspan="4" style="text-align:center; color:gray; padding: 24px;">No active tickets in queue.</td></tr>`;
         }
         window.resolveTicket = function(id) { let db = JSON.parse(localStorage.getItem('macheTicketsDB')) || []; db = db.filter(t => t.id !== id); localStorage.setItem('macheTicketsDB', JSON.stringify(db)); renderTickets(); }
 
         function renderClients() {
-            const tbody = document.getElementById('client-table-body'); if (!tbody) return; const db = JSON.parse(localStorage.getItem('macheUsersDB')) || {};
+            const tbody = document.getElementById('client-table-body'); if (!tbody) return;
+            const db = JSON.parse(localStorage.getItem('macheUsersDB')) || {};
             if(Object.keys(db).length === 0 && currentUser) { db[currentUser.email] = { name: currentUser.name, role: currentUser.role }; }
             tbody.innerHTML = Object.keys(db).map(email => `<tr><td><b style="color:var(--text-main); font-size:15px;">${db[email].name}</b><br><span style="font-size:13px;color:var(--text-muted)">${email}</span></td><td><span class="role-badge" style="color:${db[email].role==='owner'?'var(--accent-purple)':'var(--accent-blue)'}">${db[email].role}</span></td><td><span style="color:var(--success); font-weight:700; font-size:13px;">Active</span></td><td><button class="btn btn-danger" style="padding:8px 16px; font-size:13px;" onclick="deleteUser('${email}')"><i class="ph-bold ph-trash"></i> Remove</button></td></tr>`).join('');
         }
         window.deleteUser = function(email) {
-            if (email === OWNER_EMAIL) return alert("System Guard: Cannot remove the OS Owner."); if (!confirm(`Permanently remove ${email}?`)) return;
+            if (email === OWNER_EMAIL) return alert("System Guard: Cannot remove the OS Owner.");
+            if (!confirm(`Permanently remove ${email}?`)) return;
             let db = JSON.parse(localStorage.getItem('macheUsersDB')) || {}; delete db[email]; localStorage.setItem('macheUsersDB', JSON.stringify(db)); localStorage.removeItem(`macheData_${email}`); renderClients();
         }
 
         // --- AI CHAT ---
         function purchaseAI() {
-            if(!currentUser) return; currentUser.hasAIAccess = true; localStorage.setItem('macheUser', JSON.stringify(currentUser));
-            let db = JSON.parse(localStorage.getItem('macheUsersDB')) || {}; if(db[currentUser.email]) { db[currentUser.email].hasAIAccess = true; localStorage.setItem('macheUsersDB', JSON.stringify(db)); }
-            const pw = document.getElementById('ai-paywall-screen'); if(pw) pw.style.display = 'none';
+            if(!currentUser) return;
+            currentUser.hasAIAccess = true; localStorage.setItem('macheUser', JSON.stringify(currentUser));
+            let db = JSON.parse(localStorage.getItem('macheUsersDB')) || {};
+            if(db[currentUser.email]) { db[currentUser.email].hasAIAccess = true; localStorage.setItem('macheUsersDB', JSON.stringify(db)); }
+            const pw = document.getElementById('ai-paywall-screen');
+            if(pw) pw.style.display = 'none';
         }
+
         function startNewChat() {
             if (!appData.chatHistory) appData.chatHistory = [];
-            if (appData.chatHistory.length > 1) { if(!appData.savedChats) appData.savedChats = []; appData.savedChats.push([...appData.chatHistory]); }
-            appData.chatHistory = [{ role: "ai", text: "Fresh chat started! I am Gemini, your advanced Personal AI. How can I assist you today?" }]; saveData();
+            if (appData.chatHistory.length > 1) {
+                if(!appData.savedChats) appData.savedChats = [];
+                appData.savedChats.push([...appData.chatHistory]);
+            }
+            appData.chatHistory = [{ role: "ai", text: "Fresh chat started! I am Gemini, your advanced Personal AI. How can I assist you today?" }];
+            saveData();
         }
-        function renderChatHistory() { const box = document.getElementById('chat-messages-area'); if(box && appData.chatHistory) box.innerHTML = appData.chatHistory.map(m => `<div class="chat-bubble ${m.role}">${m.text}</div>`).join(''); scrollToChatBottom(); }
+
+        function renderChatHistory() {
+            const box = document.getElementById('chat-messages-area');
+            if(box && appData.chatHistory) box.innerHTML = appData.chatHistory.map(m => `<div class="chat-bubble ${m.role}">${m.text}</div>`).join('');
+            scrollToChatBottom();
+        }
         function scrollToChatBottom() { const b = document.getElementById('chat-messages-area'); if(b) b.scrollTop = b.scrollHeight; }
 
         async function sendChatMessage() {
-            const input = document.getElementById('chat-input-box'); if(!input) return; const text = input.value.trim(); if (!text) return;
-            if(!appData.chatHistory) appData.chatHistory = []; appData.chatHistory.push({role: 'user', text}); input.value = ''; renderChatHistory(); saveData();
+            const input = document.getElementById('chat-input-box'); 
+            if(!input) return;
+            const text = input.value.trim(); 
+            if (!text) return;
             
-            const box = document.getElementById('chat-messages-area'); const loading = document.createElement('div'); loading.className = "chat-bubble ai loading-dots"; 
-            if(box) box.appendChild(loading); scrollToChatBottom();
+            if(!appData.chatHistory) appData.chatHistory = [];
+            appData.chatHistory.push({role: 'user', text}); 
+            input.value = ''; renderChatHistory(); saveData();
+            
+            const box = document.getElementById('chat-messages-area');
+            const loading = document.createElement('div'); loading.className = "chat-bubble ai loading-dots"; 
+            if(box) box.appendChild(loading); 
+            scrollToChatBottom();
 
             try {
-                const response = await fetch("http://127.0.0.1:3000/api/chat", { method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify({ newMessage: text, history: appData.chatHistory.slice(0,-1).slice(-6) }) });
-                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`); const data = await response.json();
+                const response = await fetch(`${BACKEND_URL}/api/chat`, { 
+                    method: "POST", headers: {"Content-Type": "application/json"}, 
+                    body: JSON.stringify({ newMessage: text, history: appData.chatHistory.slice(0,-1).slice(-6) }) 
+                });
+                
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                
+                const data = await response.json();
                 if(box && loading.parentNode === box) box.removeChild(loading);
-                if(data.success) appData.chatHistory.push({ role: 'ai', text: data.text }); else throw new Error(data.error); saveData();
-            } catch(e) { console.error("Fetch Error:", e); if(box && loading.parentNode === box) box.removeChild(loading); appData.chatHistory.push({ role: 'ai', text: `System Error: Could not connect to backend server. Ensure node server.js is running.` }); saveData(); }
+                if(data.success) appData.chatHistory.push({ role: 'ai', text: data.text });
+                else throw new Error(data.error);
+                saveData();
+            } catch(e) {
+                console.error("Fetch Error:", e);
+                if(box && loading.parentNode === box) box.removeChild(loading);
+                appData.chatHistory.push({ role: 'ai', text: `System Error: Could not connect to backend server. Ensure node server.js is running.` });
+                saveData();
+            }
         }
 
-        function executeLogout() { triggerLoadingScreen('logout', () => { localStorage.removeItem('macheUser'); window.location.reload(); }); }
+        function executeLogout() {
+            triggerLoadingScreen('logout', () => { 
+                localStorage.removeItem('macheUser'); 
+                window.location.reload(); 
+            });
+        }
 
         window.onload = init;
     </script>
